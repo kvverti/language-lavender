@@ -7,7 +7,7 @@
     "grammar",
     "lavender"
   ],
-  "repository": "https://github.com/atom/language-lavender",
+  "repository": "https://github.com/kvverti/language-lavender",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
