@@ -1,0 +1,177 @@
+# If this is your first time writing a language grammar, check out:
+#   - https://flight-manual.atom.io/hacking-atom/sections/creating-a-grammar/
+
+scopeName: 'source.lavender'
+name: 'Lavender'
+fileTypes: [
+    'lv'
+]
+foldingStartMarker: '\\(|\\['
+foldingStopMarker: '\\)|\\]'
+patterns: [
+    { include: '#command' }
+    { include: '#expression' }
+]
+repository:
+    comment:
+        comment: 'Single line comment'
+        match: '\'.*$'
+        name: 'comment.line.quote.lavender'
+    namespace:
+        comment: 'Namespace'
+        match: '[a-zA-Z_][a-zA-Z_0-9]*:'
+        name: 'support.constant.lavender'
+    symbol:
+        comment: 'Symbolic name'
+        match: '[~!%\\^\\&*\\-+=|<>/?:]+'
+        name: 'support.function.lavender'
+    variable:
+        comment: 'Variable (begins lowercase or with a single underscore)'
+        match: '_?[a-z][a-zA-Z0-9]*'
+        name: 'variable.lavender'
+    constant:
+        comment: 'Constant value (begins uppercase or with two underscores)'
+        match: '_?[A-Z_][a-zA-Z_0-9]*'
+        name: 'support.constant.lavender'
+    number:
+        comment: 'Number'
+        match: '\\d*\\.?\\d+([eE][+-]?\\d+)?'
+        name: 'constant.numeric.lavender'
+    string:
+        comment: 'String'
+        begin: '"'
+        end: '"'
+        name: 'string.quoted.double.lavender'
+        patterns: [
+            {
+                comment: 'String escapes'
+                match: '\\\\.'
+                name: 'keyword.operator.string-escape.lavender'
+            }
+        ]
+    funcValue:
+        comment: 'Function value'
+        match: '\\\\((?:[a-zA-Z_][a-zA-Z_0-9]*)|[~!%\\^\\&*\\-+=|<>/?:]+)\\\\?'
+        name: 'meta.function-value.lavender'
+        captures:
+            1: name: 'support.function.function-value.lavender'
+    funcCall:
+        comment: 'Function value when calling'
+        match: '[a-zA-Z_][a-zA-Z_0-9]*\\s*(?=\\()'
+        name: 'support.function.lavender'
+    funcName:
+        comment: 'Function declared name'
+        match: '([uir]_)?((?:[a-zA-Z_][a-zA-Z_0-9]*)|[~!%\\^\\&*\\-+=|<>/?:]+)'
+        name: 'meta.function.name.lavender'
+        captures:
+            1: name: 'keyword.control.function.prefix.lavender'
+            2: name: 'support.function.lavender'
+    argList:
+        comment: 'Function parameter list'
+        begin: '\\('
+        end: '\\)'
+        beginCaptures:
+            0: name: 'punctuation.function.beginargs.lavender'
+        endCaptures:
+            0: name: 'punctuation.function.endargs.lavender'
+        name: 'meta.arg-list.lavender'
+        patterns: [
+            { include: '#comment' }
+            {
+                comment: 'Alphanumeric name'
+                match: '[a-zA-Z_][a-zA-Z_0-9]*'
+                name: 'variable.lavender'
+            }
+            {
+                comment: 'By name modifier'
+                match: '=>'
+                name: 'storage.modifier.byname.lavender'
+            }
+            {
+                comment: 'Varargs modifier'
+                match: '\\.\\.\\.'
+                name: 'storage.modifier.varargs.lavender'
+            }
+        ]
+    funcSig:
+        comment: 'Function signature'
+        begin: '\\bdef\\b'
+        end: '(?==>)'
+        beginCaptures:
+            0: name: 'storage.type.def.lavender'
+        name: 'meta.function.header.lavender'
+        patterns: [
+            { include: '#comment' }
+            { include: '#letExpr' }
+            { include: '#funcName' }
+            { include: '#argList' }
+        ]
+    letDefinition:
+        comment: 'Single function local definition'
+        begin: '([a-zA-Z_][a-zA-Z0-9]*)\\s*\\('
+        end: '\\)'
+        beginCaptures:
+            1: name: 'variable.lavender'
+        name: 'meta.let-definition.lavender'
+        patterns: [
+            { include: '#expression' }
+        ]
+    letExpr:
+        comment: 'Function local declarations'
+        begin: '\\blet\\b'
+        end: '(?==>)'
+        beginCaptures:
+            0: name: 'keyword.control.let.lavender'
+        name: 'meta.let-expr.lavender'
+        patterns: [
+            { include: '#letDefinition' }
+        ]
+    parenExpression:
+        comment: 'Parenthesized expression'
+        begin: '\\('
+        end: '\\)'
+        beginCaptures:
+            0: name: 'punctuation.expression.lparen.lavender'
+        endCaptures:
+            0: name: 'punctuation.expression.rparen.lavender'
+        name: 'meta.paren-expression.lavender'
+        patterns: [
+            { include: '#expression' }
+        ]
+    bracketExpression:
+        comment: 'Bracketed expression'
+        begin: '\\('
+        end: '\\)'
+        beginCaptures:
+            0: name: 'punctuation.expression.lbracket.lavender'
+        endCaptures:
+            0: name: 'punctuation.expression.rbracket.lavender'
+        name: 'meta.bracket-expression.lavender'
+        patterns: [
+            { include: '#expression' }
+        ]
+    expression:
+        comment: 'Expression'
+        patterns: [
+            { include: '#comment' }
+            { include: '#number' }
+            { include: '#string' }
+            { include: '#funcValue' }
+            {
+                comment: 'Arrow keyword'
+                match: '=>'
+                name: 'keyword.control.arrow.lavender'
+            }
+            { include: '#funcSig' }
+            { include: '#funcCall' }
+            { include: '#namespace' }
+            { include: '#variable' }
+            { include: '#constant' }
+            { include: '#symbol' }
+            { include: '#parenExpression' }
+            { include: '#bracketExpression' }
+        ]
+    command:
+        comment: 'Runtime command'
+        match: '^\\s*@[a-zA-Z_][a-zA-Z_0-9]*'
+        name: 'keyword.control.command-name.lavender'

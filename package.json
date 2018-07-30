@@ -1,0 +1,15 @@
+{
+  "name": "language-lavender",
+  "version": "0.0.0",
+  "description": "Lavender language support for Atom",
+  "keywords": [
+    "language",
+    "grammar",
+    "lavender"
+  ],
+  "repository": "https://github.com/atom/language-lavender",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  }
+}
