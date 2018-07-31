@@ -4,4 +4,13 @@
 '.source.lavender':
   'Anonymous function expression':
     'prefix': 'def'
-    'body': '(def(a) => $1)'
+    'body': 'def(a) => $1'
+  'Import command':
+    'prefix': 'import'
+    'body': '@import $1'
+  'Using command':
+    'prefix': 'using'
+    'body': '@using $1'
+  'Function object':
+    'prefix': 'object'
+    'body': '(def $1() =>\n\t(def obj(a) \n\t\t=> a ; 1\n\t)\n)'

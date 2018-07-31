@@ -20,11 +20,11 @@ repository:
     namespace:
         comment: 'Namespace'
         match: '[a-zA-Z_][a-zA-Z_0-9]*:'
-        name: 'support.constant.lavender'
+        name: 'support.constant.namespace.lavender'
     symbol:
         comment: 'Symbolic name'
         match: '[~!%\\^\\&*\\-+=|<>/?:]+'
-        name: 'support.function.lavender'
+        name: 'support.function.symbolic.lavender'
     variable:
         comment: 'Variable (begins lowercase or with a single underscore)'
         match: '_?[a-z][a-zA-Z0-9]*'
@@ -32,7 +32,7 @@ repository:
     constant:
         comment: 'Constant value (begins uppercase or with two underscores)'
         match: '_?[A-Z_][a-zA-Z_0-9]*'
-        name: 'support.constant.lavender'
+        name: 'support.constant.value.lavender'
     number:
         comment: 'Number'
         match: '\\d*\\.?\\d+([eE][+-]?\\d+)?'
@@ -51,36 +51,37 @@ repository:
         ]
     funcValue:
         comment: 'Function value'
-        match: '\\\\((?:[a-zA-Z_][a-zA-Z_0-9]*)|[~!%\\^\\&*\\-+=|<>/?:]+)\\\\?'
+        match: '\\\\((?:[a-zA-Z_][a-zA-Z_0-9]*):)?((?:[a-zA-Z_][a-zA-Z_0-9]*)|[~!%\\^\\&*\\-+=|<>/?:]+)\\\\?'
         name: 'meta.function-value.lavender'
         captures:
-            1: name: 'support.function.function-value.lavender'
+            1: name: 'support.constant.namespace.lavender'
+            2: name: 'support.function.value.lavender'
     funcCall:
         comment: 'Function value when calling'
         match: '[a-zA-Z_][a-zA-Z_0-9]*\\s*(?=\\()'
-        name: 'support.function.lavender'
+        name: 'support.function.call.lavender'
     funcName:
         comment: 'Function declared name'
         match: '([uir]_)?((?:[a-zA-Z_][a-zA-Z_0-9]*)|[~!%\\^\\&*\\-+=|<>/?:]+)'
         name: 'meta.function.name.lavender'
         captures:
             1: name: 'keyword.control.function.prefix.lavender'
-            2: name: 'support.function.lavender'
+            2: name: 'support.function.declaration.lavender'
     argList:
         comment: 'Function parameter list'
         begin: '\\('
         end: '\\)'
         beginCaptures:
-            0: name: 'punctuation.function.beginargs.lavender'
+            0: name: 'punctuation.params.lparen.lavender'
         endCaptures:
-            0: name: 'punctuation.function.endargs.lavender'
+            0: name: 'punctuation.params.rparen.lavender'
         name: 'meta.arg-list.lavender'
         patterns: [
             { include: '#comment' }
             {
-                comment: 'Alphanumeric name'
+                comment: 'Formal parameter name'
                 match: '[a-zA-Z_][a-zA-Z_0-9]*'
-                name: 'variable.lavender'
+                name: 'variable.parameter.formal.lavender'
             }
             {
                 comment: 'By name modifier'
@@ -108,10 +109,13 @@ repository:
         ]
     letDefinition:
         comment: 'Single function local definition'
-        begin: '([a-zA-Z_][a-zA-Z0-9]*)\\s*\\('
+        begin: '\\('
         end: '\\)'
+        name: 'meta.let-expr.definition.lavender'
         beginCaptures:
-            1: name: 'variable.lavender'
+            1: name: 'punctuation.let-expr.lparen.lavender'
+        endCaptures:
+            1: name: 'punctuation.let-expr.rparen.lavender'
         name: 'meta.let-definition.lavender'
         patterns: [
             { include: '#expression' }
@@ -124,7 +128,13 @@ repository:
             0: name: 'keyword.control.let.lavender'
         name: 'meta.let-expr.lavender'
         patterns: [
+            { include: '#comment' }
             { include: '#letDefinition' }
+            {
+                comment: 'Function local name'
+                match: '[a-zA-Z_][a-zA-Z_0-9]*'
+                name: 'variable.parameter.local.lavender'
+            }
         ]
     parenExpression:
         comment: 'Parenthesized expression'
@@ -140,8 +150,8 @@ repository:
         ]
     bracketExpression:
         comment: 'Bracketed expression'
-        begin: '\\('
-        end: '\\)'
+        begin: '\\['
+        end: '\\]'
         beginCaptures:
             0: name: 'punctuation.expression.lbracket.lavender'
         endCaptures:
@@ -162,6 +172,7 @@ repository:
                 match: '=>'
                 name: 'keyword.control.arrow.lavender'
             }
+            { include: '#standardConstants' }
             { include: '#funcSig' }
             { include: '#funcCall' }
             { include: '#namespace' }
@@ -175,3 +186,10 @@ repository:
         comment: 'Runtime command'
         match: '^\\s*@[a-zA-Z_][a-zA-Z_0-9]*'
         name: 'keyword.control.command-name.lavender'
+    standardConstants:
+        comment: 'Standard constants'
+        match: '(true)|(false)|(undefined)'
+        captures:
+            1: name: 'support.constant.predef.true.lavender'
+            2: name: 'support.constant.predef.false.lavender'
+            3: name: 'support.constant.predef.undefined.lavender'
