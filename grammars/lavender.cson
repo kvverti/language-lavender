@@ -6,8 +6,8 @@ name: 'Lavender'
 fileTypes: [
     'lv'
 ]
-foldingStartMarker: '\\(|\\['
-foldingStopMarker: '\\)|\\]'
+foldingStartMarker: '\\(|\\[|\\{'
+foldingStopMarker: '\\)|\\]|\\}'
 patterns: [
     { include: '#command' }
     { include: '#expression' }
@@ -78,6 +78,7 @@ repository:
         name: 'meta.arg-list.lavender'
         patterns: [
             { include: '#comment' }
+            { include: '#keyword' }
             {
                 comment: 'Formal parameter name'
                 match: '[a-zA-Z_][a-zA-Z_0-9]*'
@@ -125,15 +126,53 @@ repository:
         begin: '\\blet\\b'
         end: '(?==>)'
         beginCaptures:
-            0: name: 'keyword.control.let.lavender'
+            0: name: 'storage.type.let.lavender'
         name: 'meta.let-expr.lavender'
         patterns: [
             { include: '#comment' }
+            { include: '#keyword' }
             { include: '#letDefinition' }
             {
                 comment: 'Function local name'
                 match: '[a-zA-Z_][a-zA-Z_0-9]*'
                 name: 'variable.parameter.local.lavender'
+            }
+        ]
+    doExpr:
+        comment: 'Imperative-style monadic comprehension'
+        begin: '\\bdo\\b'
+        end: '(?=\\})'
+        beginCaptures:
+            0: name: 'keyword.control.do.lavender'
+        name: 'meta.do-expr.lavender'
+        patterns: [
+            { include: '#doBlock' }
+        ]
+    doBlock:
+        comment: 'Do expression body'
+        begin: '\\{'
+        end: '(?=\\})'
+        name: 'meta.do-block.lavender'
+        patterns: [
+            { include: '#letGenerator' }
+            { include: '#expression' }
+        ]
+    letGenerator:
+        comment: 'New value binding in do expression'
+        begin: '\\blet\\b'
+        end: '<-[^~!%\\^\\&*\\-+=|<>/?:]'
+        beginCaptures:
+            0: name: 'storage.type.let.lavender'
+        endCaptures:
+            0: name: 'keyword.control.gets.lavender'
+        name: 'meta.let-generator.lavender'
+        patterns: [
+            { include: '#comment' }
+            { include: '#keyword' }
+            {
+                comment: 'Let bound name'
+                match: '[a-zA-Z_][a-zA-Z_0-9]*'
+                name: 'variable.parameter.formal.lavender'
             }
         ]
     parenExpression:
@@ -160,6 +199,18 @@ repository:
         patterns: [
             { include: '#expression' }
         ]
+    braceExpression:
+        comment: 'Brace expression'
+        begin: '\\{'
+        end: '\\}'
+        beginCaptures:
+            0: name: 'punctuation.expression.lbrace.lavender'
+        endCaptures:
+            0: name: 'punctuation.expression.rbrace.lavender'
+        name: 'meta.bracket-expression.lavender'
+        patterns: [
+            { include: '#expression' }
+        ]
     expression:
         comment: 'Expression'
         patterns: [
@@ -167,25 +218,33 @@ repository:
             { include: '#number' }
             { include: '#string' }
             { include: '#funcValue' }
-            {
-                comment: 'Arrow keyword'
-                match: '=>'
-                name: 'keyword.control.arrow.lavender'
-            }
             { include: '#standardConstants' }
+            { include: '#doExpr' }
             { include: '#funcSig' }
             { include: '#funcCall' }
+            { include: '#keyword' }
             { include: '#namespace' }
             { include: '#variable' }
             { include: '#constant' }
             { include: '#symbol' }
             { include: '#parenExpression' }
             { include: '#bracketExpression' }
+            { include: '#braceExpression' }
         ]
     command:
         comment: 'Runtime command'
         match: '^\\s*@[a-zA-Z_][a-zA-Z_0-9]*'
         name: 'keyword.control.command-name.lavender'
+    keyword:
+        comment: 'Keywords'
+        match: '(=>[^~!%\\^\\&*\\-+=|<>/?:])|(<-[^~!%\\^\\&*\\-+=|<>/?:])|(\\bdef\\b)|(\\bdo\\b)|(\\blet\\b)|(\\bnative\\b)'
+        captures:
+            1: name: 'keyword.control.arrow.lavender'
+            2: name: 'keyword.control.gets.lavender'
+            3: name: 'storage.type.def.lavender'
+            4: name: 'keyword.control.do.lavender'
+            5: name: 'storage.type.let.lavender'
+            6: name: 'keyword.control.native.lavender'
     standardConstants:
         comment: 'Standard constants'
         match: '(true)|(false)|(undefined)'
