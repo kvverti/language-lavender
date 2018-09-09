@@ -9,7 +9,9 @@ fileTypes: [
 foldingStartMarker: '\\(|\\[|\\{'
 foldingStopMarker: '\\)|\\]|\\}'
 patterns: [
-    { include: '#command' }
+    { include: '#commandImport' }
+    { include: '#commandQuit' }
+    { include: '#commandBasic' }
     { include: '#expression' }
 ]
 repository:
@@ -231,10 +233,6 @@ repository:
             { include: '#bracketExpression' }
             { include: '#braceExpression' }
         ]
-    command:
-        comment: 'Runtime command'
-        match: '^\\s*@[a-zA-Z_][a-zA-Z_0-9]*'
-        name: 'keyword.control.command-name.lavender'
     keyword:
         comment: 'Keywords'
         match: '(=>[^~!%\\^\\&*\\-+=|<>/?:])|(<-[^~!%\\^\\&*\\-+=|<>/?:])|(\\bdef\\b)|(\\bdo\\b)|(\\blet\\b)|(\\bnative\\b)'
@@ -252,3 +250,34 @@ repository:
             1: name: 'support.constant.predef.true.lavender'
             2: name: 'support.constant.predef.false.lavender'
             3: name: 'support.constant.predef.undefined.lavender'
+    commandBasic:
+        comment: 'Pre-command'
+        match: '^\\s*@[a-z]*'
+        name: 'keyword.control.command.lavender'
+    commandQuit:
+        comment: 'Quit command'
+        match: '^\\s*@quit'
+        name: 'keyword.control.command.quit.lavender'
+    commandImport:
+        comment: 'Import command'
+        begin: '^\\s*(@import)(\\s+[A-Za-z0-9]*)?(\\s+using)?'
+        end: '$'
+        beginCaptures:
+            1: name: 'keyword.control.command.import.lavender'
+            2: name: 'support.constant.namespace.lavender'
+            3: name: 'keyword.control.command-help.using.lavender'
+        patterns: [
+            {
+                comment: 'Underscore'
+                match: '\\b_\\b'
+                name: 'keyword.control.underscore.lavender'
+            }
+            {
+                comment: 'Alias'
+                match: '([^,]+?)(?:(\\bas\\b)([^,]+?))?'
+                captures:
+                    1: name: 'support.function.import.lavender'
+                    2: name: 'keyword.control.command-help.as.lavender'
+                    3: name: 'support.function.alias.lavender'
+            }
+        ]
